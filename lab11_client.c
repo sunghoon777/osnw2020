@@ -8,28 +8,18 @@
 
 
 struct dataset{
-    char data1[30];
+    char data1[1024];
     int data2;
 };
 
 int main(int argc, char **argv)
 {
-
     struct sockaddr_in serveraddr;
     int server_sockfd;
     int client_len;
     struct dataset mydata;
     memset((void *)&mydata , 0x00, sizeof(mydata));
 
-
-    printf("문자열을 입력하세요 : ");
-    gets(mydata.data1);
-    printf("숫자를 입력하세요 : ");
-    scanf("%d", &mydata.data2);
-    
-
-    printf("%s 와 %d 를 전송하였습니다.\n",mydata.data1, mydata.data2);
- 
     if ((server_sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
         perror("error :");
@@ -47,16 +37,17 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    mydata.data2 = htonl(mydata.data2);
-
-    if (write(server_sockfd, (void *)&mydata , sizeof(mydata)) <= 0)
+    while(1)
     {
-        perror("write error : ");
-        return 1;
+        read(STDIN_FILENO, mydata.data1, sizeof(mydata.data1));
+        if(strncmp(mydata.data1, "quit\n",5) == 0)
+      	break;
+        scanf("%d", &mydata.data2);
+        mydata.data2 = htonl(mydata.data2);
+        write(server_sockfd, (void *)&mydata , sizeof(mydata));
+        read(server_sockfd, (void *)&mydata , sizeof(mydata));
+        printf("read : %s       %d\n", mydata.data1, ntohl(mydata.data2));
+        memset((void *)&mydata , 0x00, sizeof(mydata));
     }
-  
-    read(server_sockfd, (void *)&mydata , sizeof(mydata));
-    printf("문자 : %s\n", mydata.data1);
-    printf("숫자 : %d\n", ntohl(mydata.data2));
     return 0;
 }
