@@ -84,8 +84,8 @@ int main(int argc, char **argv)
                 }
                 else
                 {
-
-                    //데이터 복사
+                    // read를 통해 온 mydata안에 데이터가 존재하지 않더라도 문자열 연결이나 숫자 덧셈은 동작하게된다.
+                    //문자열 연결
                     if (count == 0)
                     {
                         strcpy(mydata_copy.data1, mydata.data1);
@@ -96,15 +96,17 @@ int main(int argc, char **argv)
                         strcat(mydata_copy.data1, mydata.data1);
                         mydata_copy.data1[strlen(mydata_copy.data1) - 1] = '\0';
                     }
+                    //숫자 덧셈
                     int a = ntohl(mydata.data2);
                     mydata_copy.data2 = mydata_copy.data2 + a;
                     a=0;
-                    //주기적으로 write함
+                    //주기적으로 write함 , client으로부터 3번 메시지를 받을때마다 write 동작을 하게된다.
                     if ((count + 1) % 3 == 0)
                     {
                         mydata_copy.data2 = htonl(mydata_copy.data2);
                         for (int j = 0; j <= count; j++)
                         {
+                            //지금까지 연결된 클라이언트 소캣들에게 전부 write를 하게 된다.
                             write(client_copy[j], (void *)&mydata_copy, sizeof(mydata_copy));
                         }
                         mydata_copy.data2 = ntohl(mydata_copy.data2);

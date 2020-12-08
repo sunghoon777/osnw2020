@@ -39,7 +39,9 @@ int main(int argc, char **argv)
 
     while(1)
     {
+        // I/0 occur
         read(STDIN_FILENO, mydata.data1, sizeof(mydata.data1));
+        //quit 입력시 끝남
         if(strncmp(mydata.data1, "quit\n",5) == 0)
       	break;
         scanf("%d", &mydata.data2);
